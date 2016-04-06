@@ -158,6 +158,22 @@ def settings_set_default_player_fromlib(media):
     
     plugin.open_settings()
     
+@plugin.route('/settings/default_player_fromcontext/<media>')
+def settings_set_default_player_fromcontext(media):
+    players = active_players(media)
+    players.insert(0, ADDON_SELECTOR)
+    
+    selection = dialogs.select(_("Select player"), [p.title for p in players])
+    if selection >= 0:
+        selected = players[selection].id
+        if media == "movies":
+            plugin.set_setting(SETTING_MOVIES_DEFAULT_PLAYER_FROM_CONTEXT, selected)
+        elif media == "tvshows":
+            plugin.set_setting(SETTING_TV_DEFAULT_PLAYER_FROM_CONTEXT, selected)
+        else:
+            raise Exception("invalid parameter %s" % media)
+    
+    plugin.open_settings()
 @plugin.route('/update_players')
 def update_players():
     url = plugin.get_setting(SETTING_PLAYERS_UPDATE_URL)

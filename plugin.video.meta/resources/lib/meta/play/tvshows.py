@@ -10,7 +10,7 @@ from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_ep
 from meta.play.players import get_needed_langs, ADDON_SELECTOR
 from meta.play.base import get_trakt_ids, active_players, action_cancel, action_play, on_play_video
 
-from settings import SETTING_USE_SIMPLE_SELECTOR, SETTING_TV_DEFAULT_PLAYER, SETTING_TV_DEFAULT_PLAYER_FROM_LIBRARY
+from settings import SETTING_USE_SIMPLE_SELECTOR, SETTING_TV_DEFAULT_PLAYER, SETTING_TV_DEFAULT_PLAYER_FROM_LIBRARY, SETTING_TV_DEFAULT_PLAYER_FROM_CONTEXT
 from language import get_string as _
 
 def play_episode(id, season, episode, mode):  
@@ -34,6 +34,8 @@ def play_episode(id, season, episode, mode):
     # Get players to use
     if mode == 'select':
         play_plugin = ADDON_SELECTOR.id
+    elif mode == 'context':
+        play_plugin = plugin.get_setting(SETTING_TV_DEFAULT_PLAYER_FROM_CONTEXT)
     elif mode == 'library':
         play_plugin = get_player_plugin_from_library(id)
         if not play_plugin:
