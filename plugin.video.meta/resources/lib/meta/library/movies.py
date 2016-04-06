@@ -72,8 +72,16 @@ def update_library():
 def add_movie_to_library(library_folder, src, id, date):    
     changed = False
     
+    # create movie folder
+    movie_folder = os.path.join(library_folder, str(id)+'/')
+    if not xbmcvfs.exists(movie_folder):
+        try: 
+            xbmcvfs.mkdir(movie_folder)
+        except:
+            pass
+
     # create nfo file
-    nfo_filepath = os.path.join(library_folder, str(id)+".nfo")
+    nfo_filepath = os.path.join(movie_folder, str(id)+".nfo")
     if not xbmcvfs.exists(nfo_filepath):
         changed = True
         nfo_file = xbmcvfs.File(nfo_filepath, 'w')
@@ -87,7 +95,7 @@ def add_movie_to_library(library_folder, src, id, date):
             os.utime(nfo_filepath, (date,date))
         
     # create strm file
-    strm_filepath = os.path.join(library_folder, str(id)+".strm")
+    strm_filepath = os.path.join(movie_folder, str(id)+".strm")
     if not xbmcvfs.exists(strm_filepath):
         changed = True
         strm_file = xbmcvfs.File(strm_filepath, 'w')
