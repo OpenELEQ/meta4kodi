@@ -132,7 +132,7 @@ msgid "Genres"
 msgstr ""
 
 msgctxt "#30602"
-msgid "Select stream..."
+msgid "Context player"
 msgstr ""
 
 msgctxt "#30603"
