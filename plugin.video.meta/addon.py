@@ -103,14 +103,28 @@ def settings_set_players(media):
 
     # Get selection by user
     selected = None
+    mediatype = media.replace('es','e').replace('ws','w')
     try:
-        result = dialogs.multiselect(_("Enable players"), [p.clean_title for p in players])
-        if result is not None:
-            selected = [players[i].id for i in result]
-    except:
-        msg = "Kodi 16 required. Do you want to enable all players instead?"
-        if dialogs.yesno(_("Warning"), _(msg)):
+        msg = "Do you want to enable all "+mediatype+" players?"
+        if dialogs.yesno(_("Enable all "+mediatype+" players"), _(msg)):
+            enableall = True
             selected = [p.id for p in players]
+        else:
+            enableall = False
+            result = dialogs.multiselect(_("Select "+mediatype+" players to enable"), [p.clean_title for p in players])
+            if result is not None:
+                selected = [players[i].id for i in result]
+    except:
+        if enableall == False:
+            msg = "Kodi 16 required for manual multi-selection. Do you want to enable all "+mediatype+" players instead?"
+            if dialogs.yesno(_("Warning"), _(msg)):
+                selected = [p.id for p in players]
+            else:
+                return
+        elif enableall == True:
+            selected = [p.id for p in players]
+        else:
+            pass
     
     if selected is not None:
         if media == "movies":
