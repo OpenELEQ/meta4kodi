@@ -5,7 +5,8 @@ from xbmcswift2 import xbmc, xbmcvfs
 
 from meta import plugin, import_tmdb, import_tvdb, LANG
 from meta.gui import dialogs
-from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, get_tvshow_metadata_trakt
+from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, \
+    get_tvshow_metadata_trakt, get_season_metadata_trakt, get_episode_metadata_trakt
 from meta.utils.text import parse_year, is_ascii
 from meta.utils.executor import execute
 from meta.utils.properties import set_property
@@ -14,7 +15,8 @@ from meta.library.tools import scan_library
 from meta.play.base import active_players
 from meta.play.tvshows import play_episode
 from meta.play.players import ADDON_DEFAULT, ADDON_SELECTOR
-from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres, caller_name, caller_args
+from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres,\
+    caller_name, caller_args
 from language import get_string as _
 from settings import CACHE_TTL, SETTING_TV_LIBRARY_FOLDER
 
@@ -79,6 +81,11 @@ def tv():
             'label': _("My calendar"),
             'path': plugin.url_for(tv_trakt_calendar),
             'icon': get_icon_path("tv"), # TODO
+        },
+        {
+            'label': _("Trakt recommendations"),
+            'path': plugin.url_for(tv_trakt_recommendations),
+            'icon': get_icon_path("tv"),  # TODO
         },
     ]
     
@@ -168,6 +175,16 @@ def tv_trakt_calendar():
     from trakt import trakt
     result = trakt.trakt_get_calendar()
     return list_trakt_episodes(result, with_time=True)
+
+@plugin.route('/tv/trakt/recommendations')
+def tv_trakt_recommendations():
+    from trakt import trakt
+    genres_dict = trakt.trakt_get_genres("tv")
+    shows = trakt.get_recommendations("shows")
+    items = []
+    for show in shows:
+        items.append(make_tvshow_item(get_tvshow_metadata_trakt(show, genres_dict)))
+    return items
     
 @plugin.cached_route('/tv/genre/<id>/<page>', TTL=CACHE_TTL)
 def tv_genre(id, page):
@@ -409,7 +426,7 @@ def make_tvshow_item(info):
     ]
              
     return {'label': info['title'],
-            'path': plugin.url_for(tv_tvshow, id=tvdb_id),
+            'path': plugin.url_for("tv_tvshow", id=tvdb_id),
             'context_menu': context_menu,
             'thumbnail': info['poster'],
             'icon': "DefaultVideo.png",
