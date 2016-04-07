@@ -98,45 +98,56 @@ def trakt_authenticate():
     
 @plugin.route('/settings/players/<media>')
 def settings_set_players(media):
-    players = get_players(media)
-    players = sorted(players,key=lambda player: player.clean_title.lower())
-
-    # Get selection by user
-    selected = None
-    mediatype = media.replace('es','e').replace('ws','w')
-    try:
-        msg = "Do you want to enable all "+mediatype+" players?"
-        if dialogs.yesno(_("Enable all "+mediatype+" players"), _(msg)):
-            enableall = True
+    playericon = get_icon_path("player")
+    if media == "all":
+        medias = ["movies","tvshows","live"]
+        for media in medias:
+            mediatype = media.replace('es','e ').replace('ws','w ').replace('all','').replace('ve','ve ')
+            players = get_players(media)
             selected = [p.id for p in players]
-        else:
-            enableall = False
-            result = dialogs.multiselect(_("Select "+mediatype+" players to enable"), [p.clean_title for p in players])
-            if result is not None:
-                selected = [players[i].id for i in result]
-    except:
-        if enableall == False:
-            msg = "Kodi 16 required for manual multi-selection. Do you want to enable all "+mediatype+" players instead?"
-            if dialogs.yesno(_("Warning"), _(msg)):
+            if selected is not None:
+                if media == "movies":
+                    plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
+                elif media == "tvshows":
+                    plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+                elif media == "live":
+                    plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
+                else:
+                    raise Exception("invalid parameter %s" % media)
+            xbmc.executebuiltin("Notification(All "+mediatype+"players, Enabled, 5000, %s)" % playericon)
+        xbmc.executebuiltin("Notification(All players, Enabled, 5000, %s)" % playericon)
+        return
+    else:
+        mediatype = media.replace('es','e ').replace('ws','w ').replace('all','').replace('ve','ve ')
+        players = get_players(media)
+        players = sorted(players,key=lambda player: player.clean_title.lower())
+        version = xbmc.getInfoLabel('System.BuildVersion')
+        if version.startswith('16') or version.startswith('17'):
+            msg = "Do you want to enable all "+mediatype+"players?"
+            if dialogs.yesno(_("Enable all "+mediatype+"players"), _(msg)):
                 selected = [p.id for p in players]
             else:
+                result = dialogs.multiselect(_("Select "+mediatype+"players to enable"), [p.clean_title for p in players])
+                if result is not None:
+                    selected = [players[i].id for i in result]
+        else:
+            selected = None
+            msg = "Kodi 16 is required for multi-selection. Do you want to enable all "+mediatype+"players instead?"
+            if dialogs.yesno(_("Enable all "+mediatype+"players"), _(msg)):
+                selected = [p.id for p in players]
+            else:
+                xbmc.executebuiltin("Notification(Nothing changed:,No "+mediatype+"players enabled, 5000, %s)" % playericon)
                 return
-        elif enableall == True:
-            selected = [p.id for p in players]
-        else:
-            pass
-    
-    if selected is not None:
-        if media == "movies":
-            plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
-        elif media == "tvshows":
-            plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
-        elif media == "live":
-            plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
-        else:
-            raise Exception("invalid parameter %s" % media)
-    
-    plugin.open_settings()
+        if selected is not None:
+            if media == "movies":
+                plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
+            elif media == "tvshows":
+                plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+            elif media == "live":
+                plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
+            else:
+                raise Exception("invalid parameter %s" % media)
+        xbmc.executebuiltin("Notification(All "+mediatype+"players, Enabled, 5000, %s)" % playericon)
     
 @plugin.route('/settings/default_player/<media>')
 def settings_set_default_player(media):

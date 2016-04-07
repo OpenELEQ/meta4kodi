@@ -27,6 +27,10 @@ msgctxt "#30012"
 msgid "Install from URL"
 msgstr ""
 
+msgctxt "#30020"
+msgid "Enable all players"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Movies"
 msgstr ""
