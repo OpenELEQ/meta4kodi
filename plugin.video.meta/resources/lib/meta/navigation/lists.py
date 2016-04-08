@@ -16,12 +16,12 @@ def lists():
         {
             'label': _("Trakt liked lists"),
             'path': plugin.url_for("lists_trakt_liked_lists"),
-            'icon': get_icon_path("tv"),  # TODO
+            'icon': get_icon_path("traktlikedlists"),  # TODO
         },
         {
             'label': _("Trakt my lists"),
             'path': plugin.url_for("lists_trakt_my_lists"),
-            'icon': get_icon_path("tv"),  # TODO
+            'icon': get_icon_path("traktmylists"),  # TODO
         }
     ]
     return items

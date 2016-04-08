@@ -43,7 +43,7 @@ def tv():
         {
             'label': _("On the air"),
             'path': plugin.url_for(tv_now_playing, page='1'),
-            'icon': get_icon_path("tv"),
+            'icon': get_icon_path("ontheair"),
         },
         {
             'label': _("Top rated"),
@@ -53,7 +53,7 @@ def tv():
         {
             'label': _("Trakt collection"),
             'path': plugin.url_for(tv_trakt_collection),
-            'icon': get_icon_path("tv"), # TODO
+            'icon': get_icon_path("traktcollection"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -64,7 +64,7 @@ def tv():
         {
             'label': _("Trakt watchlist"),
             'path': plugin.url_for(tv_trakt_watchlist),
-            'icon': get_icon_path("tv"), # TODO
+            'icon': get_icon_path("traktwatchlist"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -75,17 +75,17 @@ def tv():
         {
             'label': _("Next episodes"),
             'path': plugin.url_for(tv_trakt_next_episodes),
-            'icon': get_icon_path("tv"), # TODO
+            'icon': get_icon_path("traktnextepisodes"), # TODO
         },
         {
             'label': _("My calendar"),
             'path': plugin.url_for(tv_trakt_calendar),
-            'icon': get_icon_path("tv"), # TODO
+            'icon': get_icon_path("traktcalendar"), # TODO
         },
         {
             'label': _("Trakt recommendations"),
             'path': plugin.url_for(tv_trakt_recommendations),
-            'icon': get_icon_path("tv"),  # TODO
+            'icon': get_icon_path("traktrecommendations"),  # TODO
         },
     ]
     
