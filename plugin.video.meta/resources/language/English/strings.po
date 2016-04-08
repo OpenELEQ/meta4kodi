@@ -68,7 +68,7 @@ msgid "Preferred TV player from library"
 msgstr ""
 
 msgctxt "#30212"
-msgid "Preferred movie player from contextmenu"
+msgid "Preferred TV player from contextmenu"
 msgstr ""
 
 msgctxt "#30300"
@@ -260,8 +260,7 @@ msgid "Add all to library"
 msgstr ""
 
 msgctxt "#30419"
-msgid ""
-"Are you sure you want to add your entire Trakt collection to Kodi library?"
+msgid "Are you sure you want to add your entire Trakt collection to Kodi library?"
 msgstr ""
 
 msgctxt "#30420"
@@ -269,8 +268,7 @@ msgid "Trakt collection"
 msgstr ""
 
 msgctxt "#30421"
-msgid ""
-"Are you sure you want to add your entire Trakt watchlist to Kodi library?"
+msgid "Are you sure you want to add your entire Trakt watchlist to Kodi library?"
 msgstr ""
 
 msgctxt "#30422"
@@ -286,11 +284,11 @@ msgid "Live"
 msgstr ""
 
 msgctxt "#30501"
-msgid "Enable Live Players"
+msgid "Enable live players"
 msgstr ""
 
 msgctxt "#30510"
-msgid "Prefered Live Player"
+msgid "Preferred live player"
 msgstr ""
 
 msgctxt "#30001"
