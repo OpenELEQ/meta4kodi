@@ -5,7 +5,7 @@
     <category label="30000">
 
         <!-- Auto update players -->
-        <setting id="players_update_url" label="30010" type="text" />
+        <setting id="players_update_url" label="30010" type="text" default="https://api.github.com/repos/OpenELEQ/unofficial-meta-players-verified/zipball" />
         <setting subsetting="true" option="close" enable="!eq(-2,)" label="30012" type="action" action="RunPlugin(plugin://plugin.video.meta/update_players)"/>
         <setting label="30020" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/players/all)"/>
         

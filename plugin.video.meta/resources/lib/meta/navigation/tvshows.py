@@ -5,14 +5,13 @@ from xbmcswift2 import xbmc, xbmcvfs
 
 from meta import plugin, import_tmdb, import_tvdb, LANG
 from meta.gui import dialogs
-<<<<<<< HEAD
-from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, \
-    get_tvshow_metadata_trakt, get_season_metadata_trakt, get_episode_metadata_trakt
+#<<<<<<< HEAD
+from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, get_tvshow_metadata_trakt, get_season_metadata_trakt, get_episode_metadata_trakt
 from meta.utils.text import parse_year, is_ascii
-=======
+#=======
 from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, get_tvshow_metadata_trakt
 from meta.utils.text import parse_year, is_ascii, to_utf8
->>>>>>> 8314d70... implement proposed fixes to play_by_name
+#>>>>>>> 8314d70... implement proposed fixes to play_by_name
 from meta.utils.executor import execute
 from meta.utils.properties import set_property
 from meta.library.tvshows import setup_library, add_tvshow_to_library
@@ -20,8 +19,7 @@ from meta.library.tools import scan_library
 from meta.play.base import active_players
 from meta.play.tvshows import play_episode
 from meta.play.players import ADDON_DEFAULT, ADDON_SELECTOR
-from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres,\
-    caller_name, caller_args
+from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres, caller_name, caller_args
 from language import get_string as _
 from settings import CACHE_TTL, SETTING_TV_LIBRARY_FOLDER
 

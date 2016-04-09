@@ -118,11 +118,13 @@ def setup_library(library_folder):
         # auto configure folder
         msg = _("Would you like to automatically set Meta as a movies video source?")
         if dialogs.yesno(_("Library setup"), msg):
+            source_thumbnail = 'special://home/addons/plugin.video.meta/resources/img/movies.png'
+            
             source_name = "Meta Movies"
             
-            source_content = "('{0}','movies','metadata.themoviedb.org','',2147483647,0,'<settings><setting id=\"RatingS\" value=\"TMDb\" /><setting id=\"certprefix\" value=\"Rated \" /><setting id=\"fanart\" value=\"true\" /><setting id=\"keeporiginaltitle\" value=\"false\" /><setting id=\"language\" value=\"{1}\" /><setting id=\"tmdbcertcountry\" value=\"us\" /><setting id=\"trailer\" value=\"true\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
+            source_content = "('{0}','movies','metadata.themoviedb.org','',2147483647,1,'<settings><setting id=\"RatingS\" value=\"TMDb\" /><setting id=\"certprefix\" value=\"Rated \" /><setting id=\"fanart\" value=\"true\" /><setting id=\"keeporiginaltitle\" value=\"false\" /><setting id=\"language\" value=\"{1}\" /><setting id=\"tmdbcertcountry\" value=\"us\" /><setting id=\"trailer\" value=\"true\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
 
-            add_source(source_name, library_folder, source_content)
+            add_source(source_name, library_folder, source_content, source_thumbnail)
 
     # return translated path
     return xbmc.translatePath(library_folder)
