@@ -25,6 +25,10 @@ def active_players(media, filters={}):
         setting = SETTING_MOVIES_ENABLED_PLAYERS
     elif media == "tvshows":
         setting = SETTING_TV_ENABLED_PLAYERS
+    elif media == "music_video":
+        setting = SETTING_MUSIC_VIDEO_ENABLED_PLAYERS
+    elif media == "music":
+        setting = SETTING_MUSIC_ENABLED_PLAYERS
     elif media == "live":
         setting = SETTING_LIVE_ENABLED_PLAYERS
     else:

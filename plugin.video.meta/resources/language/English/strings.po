@@ -87,6 +87,10 @@ msgctxt "#30303"
 msgid "Update library"
 msgstr ""
 
+msgctxt "#30304"
+msgid "Library folder"
+msgstr ""
+
 msgctxt "#30400"
 msgid "Advanced"
 msgstr ""
@@ -237,6 +241,30 @@ msgstr ""
 
 msgctxt "#30628"
 msgid "Play with..."
+msgstr ""
+
+msgctxt "#30700"
+msgid "Music"
+msgstr ""
+
+msgctxt "#30701"
+msgid "Enable Music Players"
+msgstr ""
+
+msgctxt "#30710"
+msgid "Prefered Music Player"
+msgstr ""
+
+msgctxt "#30800"
+msgid "Music Video"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Enable Music Video Players"
+msgstr ""
+
+msgctxt "#30810"
+msgid "Prefered Music Video Player"
 msgstr ""
 
 msgctxt "#30414"

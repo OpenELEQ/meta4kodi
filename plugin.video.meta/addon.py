@@ -20,6 +20,7 @@ from meta.play.players import get_players, ADDON_SELECTOR
 import meta.navigation.movies
 import meta.navigation.tvshows
 import meta.navigation.live
+import meta.navigation.music
 import meta.navigation.lists
 from meta.navigation.base import get_icon_path
 from meta.play.base import active_players
@@ -43,6 +44,11 @@ def root():
             'label': _("TV Shows"),
             'path': plugin.url_for("tv"),
             'icon': get_icon_path("tv"),
+        },
+        {
+            'label': _("Music"),
+            'path': plugin.url_for("music"),
+            'icon': get_icon_path("music"),
         },
         {
             'label': _("Live"),
@@ -100,9 +106,9 @@ def trakt_authenticate():
 def settings_set_players(media):
     playericon = get_icon_path("player")
     if media == "all":
-        medias = ["movies","tvshows","live"]
+        medias = ["movies","tvshows","musicvideos","music","live"]
         for media in medias:
-            mediatype = media.replace('es','e ').replace('ws','w ').replace('all','').replace('ve','ve ')
+            mediatype = media.replace('es','e ').replace('ws','w ').replace('os','o ').replace('all','').replace('ve','ve ')
             players = get_players(media)
             selected = [p.id for p in players]
             if selected is not None:
@@ -110,6 +116,10 @@ def settings_set_players(media):
                     plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
                 elif media == "tvshows":
                     plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+                elif media == "musicvideos":
+                    plugin.set_setting(SETTING_MUSIC_VIDEO_ENABLED_PLAYERS, selected)
+                elif media == "music":
+                    plugin.set_setting(SETTING_MUSIC_ENABLED_PLAYERS, selected)
                 elif media == "live":
                     plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
                 else:
@@ -144,6 +154,10 @@ def settings_set_players(media):
                 plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
             elif media == "tvshows":
                 plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+            elif media == "musicvideos":
+                plugin.set_setting(SETTING_MUSIC_VIDEO_ENABLED_PLAYERS, selected)
+            elif media == "music":
+                plugin.set_setting(SETTING_MUSIC_ENABLED_PLAYERS, selected)
             elif media == "live":
                 plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
             else:
