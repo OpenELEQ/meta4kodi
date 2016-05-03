@@ -13,7 +13,7 @@ def get_url(stream_file):
         try:
             content = f.read()
             if content.startswith("plugin://" + pluginid):
-                return content.replace("/library", "/select")
+                return content.replace("/library", "/context")
         finally:
             f.close()
             

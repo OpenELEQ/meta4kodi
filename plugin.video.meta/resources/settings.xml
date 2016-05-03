@@ -5,8 +5,10 @@
     <category label="30000">
 
         <!-- Auto update players -->
-        <setting id="players_update_url" label="30010" type="text" />
+        <setting label="TotalSetup" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/total/)"/>
+        <setting id="players_update_url" label="30010" type="text" default="https://api.github.com/repos/OpenELEQ/unofficial-meta-players-verified/zipball" />
         <setting subsetting="true" option="close" enable="!eq(-2,)" label="30012" type="action" action="RunPlugin(plugin://plugin.video.meta/update_players)"/>
+        <setting label="30020" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/players/all)"/>
         
         <!-- Movies -->
         <setting label="30100" type="lsep"/>
@@ -23,6 +25,10 @@
             <setting label="30121" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/default_player_fromlib/movies)"/>
             <setting subsetting="true" visible="!eq(0,)" enable="false" type="text" id="movies_default_player_from_library" default="selector" />
         
+            <!-- Default player from context -->
+            <setting label="30122" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/default_player_fromcontext/movies)"/>
+            <setting subsetting="true" visible="!eq(0,)" enable="false" type="text" id="movies_default_player_from_context" default="selector" />
+    
         <!-- TV shows -->
         <setting label="30200" type="lsep"/>
         
@@ -37,6 +43,10 @@
             <!-- Default players from library -->
             <setting label="30211" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/default_player_fromlib/tvshows)"/>
             <setting subsetting="true" visible="!eq(0,)" enable="false" type="text" id="tv_default_player_from_library" default="selector" />
+
+            <!-- Default players from context -->
+            <setting label="30212" option="close" type="action" action="RunPlugin(plugin://plugin.video.meta/settings/default_player_fromcontext/tvshows)"/>
+            <setting subsetting="true" visible="!eq(0,)" enable="false" type="text" id="tv_default_player_from_context" default="selector" />
 
         <!-- Live TV -->
         <setting label="30500" type="lsep"/>
@@ -72,6 +82,11 @@
         <setting label="30200" type="lsep"/>        
             <!-- library folder -->
             <setting id="tv_library_folder" label="30302" type="folder" default="special://profile/addon_data/plugin.video.meta/TVShows/" />
+
+        <!-- Playlists -->
+        <setting label="Playlists" type="lsep"/>        
+            <!-- library folder -->
+            <setting id="playlist_folder" label="Playlist folder" type="folder" default="special://profile/playlists/video/Meta/" />
             
     </category>
     

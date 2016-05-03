@@ -95,8 +95,11 @@ def flat_extract(z, extract_to, members=None):
     if not os.path.exists(extract_to):
         os.makedirs(extract_to)
     else:
-        if dialogs.yesno(_("Update players"), _("Do you want to remove your existing players first?")):
+        if xbmc.getInfoLabel('Window(home).Property(running)') == 'totalmeta':
             empty_folder(extract_to)
+        else:
+            if dialogs.yesno(_("Update players"), _("Do you want to remove your existing players first?")):
+                empty_folder(extract_to)
         
     for member in members:
         with contextlib.closing(z.open(member)) as source:

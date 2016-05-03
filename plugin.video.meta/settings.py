@@ -19,13 +19,16 @@ if __name__ == "__main__":
             f.write(line)    
 
 #GENERATED
+SETTING_PLAYLIST_FOLDER = "playlist_folder"
 SETTING_PLAYERS_UPDATE_URL = "players_update_url"
 SETTING_MOVIES_ENABLED_PLAYERS = "movies_enabled_players"
 SETTING_MOVIES_DEFAULT_PLAYER = "movies_default_player"
 SETTING_MOVIES_DEFAULT_PLAYER_FROM_LIBRARY = "movies_default_player_from_library"
+SETTING_MOVIES_DEFAULT_PLAYER_FROM_CONTEXT = "movies_default_player_from_context"
 SETTING_TV_ENABLED_PLAYERS = "tv_enabled_players"
 SETTING_TV_DEFAULT_PLAYER = "tv_default_player"
 SETTING_TV_DEFAULT_PLAYER_FROM_LIBRARY = "tv_default_player_from_library"
+SETTING_TV_DEFAULT_PLAYER_FROM_CONTEXT = "tv_default_player_from_context"
 SETTING_LIVE_ENABLED_PLAYERS = "live_enabled_players"
 SETTING_LIVE_DEFAULT_PLAYER = "live_default_player"
 SETTING_LIBRARY_SET_DATE = "library_set_date"

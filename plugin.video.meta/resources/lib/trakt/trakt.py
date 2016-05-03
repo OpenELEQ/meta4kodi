@@ -20,7 +20,7 @@ LIST_PRIVACY_IDS = (
     'public'
 )
 
-def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, pagination = False, page = 1):
+def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, pagination = False):
     params = dict([(k, to_utf8(v)) for k, v in params.items() if v])
     
     headers = {
@@ -49,18 +49,22 @@ def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, pagi
         else:
             return requests.get("{0}/{1}".format(API_ENDPOINT, path), params, headers=headers)
 
-    def paginated_query(page):
+    def paginated_query():
+        page = 1
         lists = []
-        params['page'] = page
-        results = send_query()
-        if with_auth and results.status_code == 401 and dialogs.yesno(_("Authenticate Trakt"), _(
-                "You must authenticate with Trakt. Do you want to authenticate now?")) and trakt_authenticate():
-            response = paginated_query()
-            return response
-        results.raise_for_status()
-        results.encoding = 'utf-8'
-        lists.extend(results.json())
-        return lists, results.headers["X-Pagination-Page-Count"]
+        while True:
+            params['page'] = page
+            results = send_query()
+            if with_auth and results.status_code == 401 and dialogs.yesno(_("Authenticate Trakt"), _(
+                    "You must authenticate with Trakt. Do you want to authenticate now?")) and trakt_authenticate():
+                response = paginated_query()
+                return response
+            results.raise_for_status()
+            results.encoding = 'utf-8'
+            lists.extend(results.json())
+            if int(results.headers["X-Pagination-Page-Count"]) <= page:
+                return lists
+            page += 1
 
     if pagination == False:
         response = send_query()
@@ -71,8 +75,8 @@ def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, pagi
         response.encoding = 'utf-8'
         return response.json()
     else:
-        (response, numpages) = paginated_query(page)
-        return response, numpages
+        response = paginated_query()
+        return response
     
 
     
@@ -176,9 +180,8 @@ def trakt_get_lists():
     return call_trakt("users/me/lists")
 
 @plugin.cached(TTL=CACHE_TTL, cache="trakt")
-def trakt_get_liked_lists(page = 1):
-    result, pages = call_trakt("users/likes/lists", params={'limit': 25}, pagination= True, page = page)
-    return result, pages
+def trakt_get_liked_lists():
+    return call_trakt("users/likes/lists", pagination= True)
 
 @plugin.cached(TTL=CACHE_TTL, cache="trakt")
 def get_list(user, list_slug):
@@ -259,8 +262,3 @@ def add_to_list(username, slug, data):
 
 def remove_from_list(username, slug, data):
     return call_trakt("/users/{0}/lists/{1}/items/remove".format(username, slug), data = data)
-
-@plugin.cached(TTL=CACHE_TTL, cache="trakt")
-def search_for_list(list_name, page):
-    results, pages = call_trakt("search", params={'type': "list", 'query': list_name, 'limit': 25}, pagination= True, page = page)
-    return results, pages

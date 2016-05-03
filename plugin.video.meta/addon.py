@@ -98,31 +98,57 @@ def trakt_authenticate():
     
 @plugin.route('/settings/players/<media>')
 def settings_set_players(media):
-    players = get_players(media)
-    players = sorted(players,key=lambda player: player.clean_title.lower())
-
-    # Get selection by user
-    selected = None
-    try:
-        result = dialogs.multiselect(_("Enable players"), [p.clean_title for p in players])
-        if result is not None:
-            selected = [players[i].id for i in result]
-    except:
-        msg = "Kodi 16 required. Do you want to enable all players instead?"
-        if dialogs.yesno(_("Warning"), _(msg)):
+    playericon = get_icon_path("player")
+    if media == "all":
+        medias = ["movies","tvshows","live"]
+        for media in medias:
+            mediatype = media.replace('es','e ').replace('ws','w ').replace('all','').replace('ve','ve ')
+            players = get_players(media)
             selected = [p.id for p in players]
-    
-    if selected is not None:
-        if media == "movies":
-            plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
-        elif media == "tvshows":
-            plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
-        elif media == "live":
-            plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
+            if selected is not None:
+                if media == "movies":
+                    plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
+                elif media == "tvshows":
+                    plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+                elif media == "live":
+                    plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
+                else:
+                    raise Exception("invalid parameter %s" % media)
+            plugin.notify(msg=_('All '+mediatype+'players'), title=_('Enabled'), delay=1000, image=get_icon_path("player"))
+        plugin.notify(msg=_('All players'), title=_('Enabled'), delay=1000, image=get_icon_path("player"))
+        return
+    else:
+        mediatype = media.replace('es','e ').replace('ws','w ').replace('all','').replace('ve','ve ')
+        players = get_players(media)
+        players = sorted(players,key=lambda player: player.clean_title.lower())
+        version = xbmc.getInfoLabel('System.BuildVersion')
+        if version.startswith('16') or version.startswith('17'):
+            msg = "Do you want to enable all "+mediatype+"players?"
+            if dialogs.yesno(_("Enable all "+mediatype+"players"), _(msg)):
+                selected = [p.id for p in players]
+            else:
+                result = dialogs.multiselect(_("Select "+mediatype+"players to enable"), [p.clean_title for p in players])
+                if result is not None:
+                    selected = [players[i].id for i in result]
         else:
-            raise Exception("invalid parameter %s" % media)
-    
-    plugin.open_settings()
+            selected = None
+            msg = "Kodi 16 is required for multi-selection. Do you want to enable all "+mediatype+"players instead?"
+            if dialogs.yesno(_("Enable all "+mediatype+"players"), _(msg)):
+                selected = [p.id for p in players]
+            else:
+                result = dialogs.multichoice(_("Select "+mediatype+"players to enable"), [p.clean_title for p in players])
+                if result is not None:
+                    selected = [players[i].id for i in result]
+        if selected is not None:
+            if media == "movies":
+                plugin.set_setting(SETTING_MOVIES_ENABLED_PLAYERS, selected)
+            elif media == "tvshows":
+                plugin.set_setting(SETTING_TV_ENABLED_PLAYERS, selected)
+            elif media == "live":
+                plugin.set_setting(SETTING_LIVE_ENABLED_PLAYERS, selected)
+            else:
+                raise Exception("invalid parameter %s" % media)
+        plugin.notify(msg=_('All '+mediatype+'players'), title=_('Updated'), delay=1000, image=get_icon_path("player"))
     
 @plugin.route('/settings/default_player/<media>')
 def settings_set_default_player(media):
@@ -158,17 +184,60 @@ def settings_set_default_player_fromlib(media):
     
     plugin.open_settings()
     
+@plugin.route('/settings/default_player_fromcontext/<media>')
+def settings_set_default_player_fromcontext(media):
+    players = active_players(media)
+    players.insert(0, ADDON_SELECTOR)
+    
+    selection = dialogs.select(_("Select player"), [p.title for p in players])
+    if selection >= 0:
+        selected = players[selection].id
+        if media == "movies":
+            plugin.set_setting(SETTING_MOVIES_DEFAULT_PLAYER_FROM_CONTEXT, selected)
+        elif media == "tvshows":
+            plugin.set_setting(SETTING_TV_DEFAULT_PLAYER_FROM_CONTEXT, selected)
+        else:
+            raise Exception("invalid parameter %s" % media)
+    
+    plugin.open_settings()
 @plugin.route('/update_players')
 def update_players():
     url = plugin.get_setting(SETTING_PLAYERS_UPDATE_URL)
-    
     if updater.update_players(url):
-        plugin.notify(msg=_('Players updated'), delay=1000)
+        plugin.notify(msg=_('Players'), title=_('Updated'), delay=1000, image=get_icon_path("player"))
     else:
-        plugin.notify(msg=_('Failed to update players'), delay=1000)
-    
+        plugin.notify(msg=_('Players update'), title=_('Failed'), delay=1000, image=get_icon_path("player"))
     plugin.open_settings()
         
+@plugin.route('/total')
+def total():
+    xbmc.executebuiltin('SetProperty(running,totalmeta,home)')
+    plugin.notify(msg=_('Automated install'), title=_('Started'), delay=1000, image=get_icon_path("meta"))
+    url = "https://api.github.com/repos/OpenELEQ/unofficial-meta-players-verified/zipball"
+    if updater.update_players(url):
+        plugin.notify(msg=_('Players'), title=_('Updated'), delay=1000, image=get_icon_path("player"))
+    else:
+        plugin.notify(msg=_('Players update'), title=_('Failed'), delay=1000, image=get_icon_path("player"))
+    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.meta/settings/players/all/)")
+    movielibraryfolder = plugin.get_setting(SETTING_MOVIES_LIBRARY_FOLDER)
+    try:
+        meta.library.movies.auto_movie_setup(movielibraryfolder)
+        plugin.notify(msg=_('Movies library folder'), title=_('Setup Done'), delay=1000, image=get_icon_path("movies"))
+    except:
+        plugin.notify(msg=_('Movies library folder'), title=_('Setup Failed'), delay=1000, image=get_icon_path("movies"))
+    tvlibraryfolder = plugin.get_setting(SETTING_TV_LIBRARY_FOLDER)
+    try:
+        meta.library.tvshows.auto_tv_setup(tvlibraryfolder)
+        plugin.notify(msg=_('TVShows library folder'), title=_('Setup Done'), delay=1000, image=get_icon_path("tv"))
+    except:
+        plugin.notify(msg=_('TVShows library folder'), title=_('Setup Failed'), delay=1000, image=get_icon_path("player"))
+    xbmc.sleep(5000)
+    while xbmc.getCondVisibility("Window.IsActive(dialoginfo)"):
+        if not xbmc.getCondVisibility("Window.IsActive(dialoginfo)"):
+            break
+    plugin.notify(msg=_('Automated install'), title=_('Completed'), delay=5000, image=get_icon_path("meta"))
+    xbmc.executebuiltin('ClearProperty(running,home)')
+#$INFO[Window(home).Property(totalmeta)]   xbmc.getInfoLabel('Window(home).Property(totalmeta)')
 
 #########   Main    #########
 

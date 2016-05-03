@@ -53,7 +53,7 @@ def movies():
         {
             'label': _("Trakt collection"),
             'path': plugin.url_for(movies_trakt_collection),
-            'icon': get_icon_path("traktcollection"),
+            'icon': get_icon_path("traktcollection"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -64,7 +64,7 @@ def movies():
         {
             'label': _("Trakt watchlist"),
             'path': plugin.url_for(movies_trakt_watchlist),
-            'icon': get_icon_path("traktwatchlist"),
+            'icon': get_icon_path("traktwatchlist"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -75,7 +75,7 @@ def movies():
         {
             'label': _("Trakt recommendations"),
             'path': plugin.url_for(movies_trakt_recommendations),
-            'icon': get_icon_path("traktrecommendations"),
+            'icon': get_icon_path("traktrecommendations"),  # TODO
         },
     ]
 
@@ -90,22 +90,17 @@ def movies_search():
     """ Activate movie search """
     search(movies_search_term)
 
-@plugin.route('/movies/play_by_name/<name>/<lang>')
+@plugin.route('/movies/play_by_name/<name>')
 def movies_play_by_name(name, lang = "en"):
-    """ Activate movie search """
+    """ Activate tv search """
     import_tmdb()
     from meta.utils.text import parse_year
 
-    items = tmdb.Search().movie(query=name, language=lang, page=1)["results"]
-
-    if items == []:
-        dialogs.ok(_("Movie not found"), "{0} {1}".format(_("No movie information found on TMDB for"),name))
-        return
+    items = tmdb.Search().movie(query=name, language=LANG, page=1)["results"]
 
     if len(items) > 1:
-        selection = dialogs.select(_("Choose Movie"), ["{0} ({1})".format(
-            to_utf8(s["title"]),
-            parse_year(s["release_date"])) for s in items])
+        selection = dialogs.select(_("Choose Movie"),
+                                   [to_utf8(s["title"]) + " (" + parse_year(s["release_date"]) + ")" for s in items])
     else:
         selection = 0
     if selection != -1:

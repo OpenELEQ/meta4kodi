@@ -5,9 +5,13 @@ from xbmcswift2 import xbmc, xbmcvfs
 
 from meta import plugin, import_tmdb, import_tvdb, LANG
 from meta.gui import dialogs
-from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, \
-    get_tvshow_metadata_trakt, get_season_metadata_trakt, get_episode_metadata_trakt
+#<<<<<<< HEAD
+from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, get_tvshow_metadata_trakt, get_season_metadata_trakt, get_episode_metadata_trakt
+from meta.utils.text import parse_year, is_ascii
+#=======
+from meta.info import get_tvshow_metadata_tvdb, get_season_metadata_tvdb, get_episode_metadata_tvdb, get_tvshow_metadata_trakt
 from meta.utils.text import parse_year, is_ascii, to_utf8
+#>>>>>>> 8314d70... implement proposed fixes to play_by_name
 from meta.utils.executor import execute
 from meta.utils.properties import set_property
 from meta.library.tvshows import setup_library, add_tvshow_to_library
@@ -15,8 +19,7 @@ from meta.library.tools import scan_library
 from meta.play.base import active_players
 from meta.play.tvshows import play_episode
 from meta.play.players import ADDON_DEFAULT, ADDON_SELECTOR
-from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres,\
-    caller_name, caller_args
+from meta.navigation.base import search, get_icon_path, get_genre_icon, get_genres, get_tv_genres, caller_name, caller_args
 from language import get_string as _
 from settings import CACHE_TTL, SETTING_TV_LIBRARY_FOLDER
 
@@ -53,7 +56,7 @@ def tv():
         {
             'label': _("Trakt collection"),
             'path': plugin.url_for(tv_trakt_collection),
-            'icon': get_icon_path("traktcollection"),
+            'icon': get_icon_path("traktcollection"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -64,7 +67,7 @@ def tv():
         {
             'label': _("Trakt watchlist"),
             'path': plugin.url_for(tv_trakt_watchlist),
-            'icon': get_icon_path("traktwatchlist"),
+            'icon': get_icon_path("traktwatchlist"), # TODO
             'context_menu': [
                 (
                     _("Add to library"),
@@ -75,17 +78,17 @@ def tv():
         {
             'label': _("Next episodes"),
             'path': plugin.url_for(tv_trakt_next_episodes),
-            'icon': get_icon_path("traktnextepisodes"),
+            'icon': get_icon_path("traktnextepisodes"), # TODO
         },
         {
             'label': _("My calendar"),
             'path': plugin.url_for(tv_trakt_calendar),
-            'icon': get_icon_path("traktcalendar"),
+            'icon': get_icon_path("traktcalendar"), # TODO
         },
         {
             'label': _("Trakt recommendations"),
             'path': plugin.url_for(tv_trakt_recommendations),
-            'icon': get_icon_path("traktrecommendations"),
+            'icon': get_icon_path("traktrecommendations"),  # TODO
         },
     ]
     
@@ -100,67 +103,26 @@ def tv_search():
     """ Activate movie search """
     search(tv_search_term)
 
-@plugin.route('/tv/play_by_name/<name>/<season>/<episode>/<lang>', options = {"lang": "en"})
-def tv_play_by_name(name, season, episode, lang):
+@plugin.route('/tv/play_by_name/<name>/<season>/<episode>')
+def tv_play_by_name(name, season, episode, lang = "en"):
     """ Activate tv search """
-    tvdb_id = get_tvdb_id_from_name(name, lang)
-    if tvdb_id:
-        tv_play(tvdb_id, season, episode, "default")
-
-@plugin.route('/tv/play_by_name_only/<name>/<lang>', options = {"lang": "en"})
-def tv_play_by_name_only(name, lang):
-    tvdb_id = get_tvdb_id_from_name(name, lang)
-    if tvdb_id:
-        season = None
-        episode = None
-        show = tv_tvshow(tvdb_id)
-
-        while season is None or episode is None:  # don't exit completely if pressing back from episode selector
-            selection = dialogs.select(_("Choose season"), [item["label"] for item in show])
-            if selection != -1:
-                season = show[selection]["info"]["season"]
-                season = int(season)
-            else:
-                return
-            items = []
-            episodes = tv_season(tvdb_id, season)
-            for item in episodes:
-                label = "S{0}E{1} - {2}".format(item["info"]["season"], item["info"]["episode"],
-                                                to_utf8(item["info"]["title"]))
-                if item["info"]["plot"] is not None:
-                    label += " - {0}".format(to_utf8(item["info"]["plot"]))
-                items.append(label)
-            selection = dialogs.select(_("Choose episode"), items)
-            if selection != -1:
-                episode = episodes[selection]["info"]["episode"]
-                episode = int(episode)
-                tv_play(tvdb_id, season, episode, "default")
-
-def get_tvdb_id_from_name(name, lang):
     import_tvdb()
 
-    search_results = tvdb.search(name, language=lang)
-
-    if search_results == []:
-        dialogs.ok(_("Show not found"), "{0} {1} in tvdb".format(_("no show information found for"), to_utf8(name)))
-        return
+    search_results = tvdb.search(name, language= lang)
 
     items = []
     for show in search_results:
-        if "firstaired" in show:
-            show["year"] = int(show['firstaired'].split("-")[0].strip())
-        else:
-            show["year"] = 0
+        show["year"] = int(show['firstaired'].split("-")[0].strip())
         items.append(show)
 
     if len(items) > 1:
-        selection = dialogs.select(_("Choose Show"), ["{0} ({1})".format(
-            to_utf8(s["seriesname"]), s["year"]) for s in items])
+        selection = dialogs.select(_("Choose Show"),
+                                   [to_utf8(s["seriesname"]) + " (" + str(s["year"]) + ")" for s in items])
     else:
         selection = 0
     if selection != -1:
-        return items[selection]["id"]
-
+        id = items[selection]["id"]
+        tv_play(id, season, episode, "default")
 
 @plugin.route('/tv/search_term/<term>/<page>')
 def tv_search_term(term, page):

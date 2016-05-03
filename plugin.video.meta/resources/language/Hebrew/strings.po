@@ -124,8 +124,8 @@ msgid "Genres"
 msgstr "סגנונות"
 
 msgctxt "#30602"
-msgid "Select stream..."
-msgstr "בחר מקור הזרמה..."
+msgid "Context player"
+msgstr "נגן הקשר"
 
 msgctxt "#30603"
 msgid "Show info"

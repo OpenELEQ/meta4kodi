@@ -79,7 +79,7 @@ def add_movie_to_library(library_folder, src, id, date):
             xbmcvfs.mkdir(movie_folder)
         except:
             pass
-    
+
     # create nfo file
     nfo_filepath = os.path.join(movie_folder, str(id)+".nfo")
     if not xbmcvfs.exists(nfo_filepath):
@@ -104,6 +104,8 @@ def add_movie_to_library(library_folder, src, id, date):
         strm_file.close()
         if date and plugin.get_setting(SETTING_LIBRARY_SET_DATE, converter=bool):
             os.utime(strm_filepath, (date,date))
+    xbmc.executebuiltin("RunScript(script.qlickplay,info=afteradd)")
+    xbmc.executebuiltin("RunScript(script.artworkdownloader,mediatype=movie,dbid=%s)" % xbmc.getInfoLabel('ListItem.DBID'))
     
     return changed    
 
@@ -118,7 +120,8 @@ def setup_library(library_folder):
         # auto configure folder
         msg = _("Would you like to automatically set Meta as a movies video source?")
         if dialogs.yesno(_("Library setup"), msg):
-            source_thumbnail = "special://home/addons/plugin.video.meta/resources/img/movies.png"
+            source_thumbnail = 'special://home/addons/plugin.video.meta/resources/img/movies.png'
+            
             source_name = "Meta Movies"
             
             source_content = "('{0}','movies','metadata.themoviedb.org','',2147483647,1,'<settings><setting id=\"RatingS\" value=\"TMDb\" /><setting id=\"certprefix\" value=\"Rated \" /><setting id=\"fanart\" value=\"true\" /><setting id=\"keeporiginaltitle\" value=\"false\" /><setting id=\"language\" value=\"{1}\" /><setting id=\"tmdbcertcountry\" value=\"us\" /><setting id=\"trailer\" value=\"true\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
@@ -127,3 +130,13 @@ def setup_library(library_folder):
 
     # return translated path
     return xbmc.translatePath(library_folder)
+
+def auto_movie_setup(library_folder):
+    if library_folder[-1] != "/":
+        library_folder += "/"
+    if not xbmcvfs.exists(library_folder):
+        xbmcvfs.mkdir(library_folder)
+        source_thumbnail = 'special://home/addons/plugin.video.meta/resources/img/movies.png'
+        source_name = "Meta Movies"
+        source_content = "('{0}','movies','metadata.themoviedb.org','',2147483647,1,'<settings><setting id=\"RatingS\" value=\"TMDb\" /><setting id=\"certprefix\" value=\"Rated \" /><setting id=\"fanart\" value=\"true\" /><setting id=\"keeporiginaltitle\" value=\"false\" /><setting id=\"language\" value=\"{1}\" /><setting id=\"tmdbcertcountry\" value=\"us\" /><setting id=\"trailer\" value=\"true\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
+        add_source(source_name, library_folder, source_content, source_thumbnail)

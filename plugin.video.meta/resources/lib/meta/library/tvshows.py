@@ -10,7 +10,7 @@ from meta.utils.properties import set_property
 from meta.library.tools import scan_library, add_source
 from meta.gui import dialogs
 
-from settings import SETTING_TV_LIBRARY_FOLDER, SETTING_LIBRARY_SET_DATE
+from settings import SETTING_TV_LIBRARY_FOLDER, SETTING_LIBRARY_SET_DATE, SETTING_PLAYLIST_FOLDER
 from language import get_string as _
 
 def update_library():
@@ -53,6 +53,21 @@ def add_tvshow_to_library(library_folder, show, play_plugin = None):
     
     id = show['id']
     showname = to_utf8(show['seriesname'])
+
+    ## Create show playlist
+    playlist_folder = plugin.get_setting(SETTING_PLAYLIST_FOLDER)
+    if not xbmcvfs.exists(playlist_folder):
+        try: 
+            xbmcvfs.mkdir(playlist_folder)
+        except:
+            plugin.notify(msg=_('Creation of Meta Playlist Folder'), title=_('Failed'), delay=5000)
+            pass
+    playlist_file = os.path.join(playlist_folder, id+".xsp")
+    if not xbmcvfs.exists(playlist_file):
+        playlist_file = xbmcvfs.File(playlist_file, 'w')
+        content = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?><smartplaylist type="tvshows"><name>%s</name><match>all</match><rule field="path" operator="contains"><value>%s%s</value></rule><rule field="playcount" operator="is"><value>0</value></rule><order direction="ascending">numepisodes</order></smartplaylist>' % (showname, plugin.get_setting(SETTING_TV_LIBRARY_FOLDER).replace('special://profile',''), str(id))
+        playlist_file.write(content)
+        playlist_file.close()
 
     ## Create show folder
     enc_show = showname.translate(None, '\/:*?"<>|').strip('.')
@@ -125,6 +140,7 @@ def add_tvshow_to_library(library_folder, show, play_plugin = None):
     if not dirs:
         shutil.rmtree(show_folder)
         clean_needed = True
+    xbmc.executebuiltin("RunScript(script.qlickplay,info=afteradd)")
                 
     return clean_needed
     
@@ -198,7 +214,8 @@ def setup_library(library_folder):
         # auto configure folder
         msg = _("Would you like to automatically set Meta as a tv shows source?")
         if dialogs.yesno(_("Library setup"), msg):
-            source_thumbnail = "special://home/addons/plugin.video.meta/resources/img/tv.png"
+            source_thumbnail = 'special://home/addons/plugin.video.meta/resources/img/tv.png'
+            
             source_name = "Meta TVShows"
             
             source_content = "('{0}','tvshows','metadata.tvdb.com','',0,0,'<settings><setting id=\"RatingS\" value=\"TheTVDB\" /><setting id=\"absolutenumber\" value=\"false\" /><setting id=\"dvdorder\" value=\"false\" /><setting id=\"fallback\" value=\"true\" /><setting id=\"fanart\" value=\"true\" /><setting id=\"language\" value=\"{1}\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
@@ -207,3 +224,13 @@ def setup_library(library_folder):
 
     # return translated path
     return xbmc.translatePath(library_folder)
+
+def auto_tv_setup(library_folder):
+    if library_folder[-1] != "/":
+        library_folder += "/"
+    if not xbmcvfs.exists(library_folder):
+        xbmcvfs.mkdir(library_folder)
+        source_thumbnail = xbmc.translatePath('special://home/addons/plugin.video.meta/resources/img/tv.png')
+        source_name = "Meta TVShows"
+        source_content = "('{0}','tvshows','metadata.tvdb.com','',0,0,'<settings><setting id=\"RatingS\" value=\"TheTVDB\" /><setting id=\"absolutenumber\" value=\"false\" /><setting id=\"dvdorder\" value=\"false\" /><setting id=\"fallback\" value=\"true\" /><setting id=\"fanart\" value=\"true\" /><setting id=\"language\" value=\"{1}\" /></settings>',0,0,NULL,NULL)".format(library_folder, LANG)
+        add_source(source_name, library_folder, source_content, source_thumbnail)
